@@ -2,7 +2,7 @@ import json
 import sqlite3
 from pathlib import Path
 
-ROOT_DIR = Path(file).resolve().parent.parent
+ROOT_DIR = Path(__file__).resolve().parent.parent
 DB_PATH = Path(__file__).resolve().parent.parent / "db" / "novaretail.db"
 POLICIES_DIR = Path(__file__).resolve().parent.parent / "policies"
 
