@@ -16,9 +16,7 @@ def seed_database():
         CREATE TABLE customers (
             customer_id TEXT PRIMARY KEY,
             full_name TEXT NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            is_verified INTEGER NOT NULL,
-            account_standing TEXT NOT NULL
+            email TEXT UNIQUE NOT NULL
         )
     """)
 
@@ -54,11 +52,11 @@ def seed_database():
 
     # Seed Customers
     customers = [
-        ("CUST-101", "Alice Vance", "alice@example.com", 1, "ACTIVE"),
-        ("CUST-102", "Bob Mercer", "bob@example.com", 0, "ACTIVE"),
-        ("CUST-103", "Clara Oswald", "clara@example.com", 1, "ACTIVE"),
+        ("CUST-101", "Alice Vance", "alice@example.com"),
+        ("CUST-102", "Bob Mercer", "bob@example.com"),
+        ("CUST-103", "Clara Oswald", "clara@example.com"),
     ]
-    cursor.executemany("INSERT INTO customers VALUES (?, ?, ?, ?, ?)", customers)
+    cursor.executemany("INSERT INTO customers VALUES (?, ?, ?)", customers)
 
     # Seed Orders (covering Happy Path, High Value, Expired, Already Refunded, Transient Timeout, Multi-Concern)
     orders = [

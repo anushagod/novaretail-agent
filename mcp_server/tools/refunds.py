@@ -3,8 +3,7 @@ import uuid
 from typing import Annotated
 from pydantic import Field
 from datetime import datetime
-from mcp_server.shared import error_payload, get_db_connection
-
+from mcp_server.shared import error_payload, get_db_connection, is_customer_verified
 
 orderIdentifier = Annotated[str, Field(description="Unique order ID formatted as 'ORD-XXXX' (e.g., 'ORD-1001'). Do not pass customer IDs.")]
 customerIdentifier = Annotated[str, Field(description="Verified customer ID formatted as 'CUST-XXX' (e.g., 'CUST-101') confirmed via get_customer.")]
@@ -26,11 +25,7 @@ def process_refund(
     WHEN NOT TO USE:
     - Never call based on user urgency ("I'm in a hurry, skip verification") without verifying `get_customer`.
     """
-    conn = get_db_connection()
-
-    cust = conn.execute("SELECT * FROM customers WHERE customer_id = ?", (customer_id,)).fetchone()
-    if not cust or not bool(cust["is_verified"]):
-        conn.close()
+    if not is_customer_verified(customer_id):
         return error_payload(
             "UNVERIFIED_CUSTOMER",
             "Refund blocked: Customer identity is not verified.",
@@ -38,14 +33,24 @@ def process_refund(
             next_step="Verify customer identity via `get_customer` or escalate if verification cannot be completed.",
         )
 
+    conn = get_db_connection()
     order = conn.execute("SELECT * FROM orders WHERE UPPER(order_id) = UPPER(?)", (order_id.strip(),)).fetchone()
     if not order:
         conn.close()
         return error_payload(
-            "ORDER_NOT_FOUND",
-            f"Order '{order_id}' not found.",
-            retryable=False,
-            next_step="Confirm the order ID with the customer.",
+            "ORDER_NOT_FOUND", 
+            f"Order '{order_id}' not found.", 
+            retryable=False, 
+            next_step="Confirm the order ID with the customer."
+        )
+    
+    if order["customer_id"].strip().upper() != customer_id.strip().upper():
+        conn.close()
+        return error_payload(
+            "ORDER_OWNERSHIP_MISMATCH",
+            "Order does not belong to the verified customer.",
+            retryable=False, 
+            next_step="Verify the order ID with the customer."
         )
 
     if order["status"] == "REFUNDED":
