@@ -5,12 +5,8 @@ from mcp_server.shared import error_payload, get_db_connection
 
 CustomerIdentifier = Annotated[
     str,
-    Field(
-        description=(
-            "Customer ID (e.g., 'CUST-101') or registered email address "
-            "(e.g., 'alice@example.com'). Do not pass order IDs."
-        )
-    ),
+    Field(description=("Customer ID (e.g., 'CUST-101') or registered email address "
+                       "(e.g., 'alice@example.com'). Do not pass order IDs.")),
 ]
 
 def get_customer(identifier: CustomerIdentifier) -> str:

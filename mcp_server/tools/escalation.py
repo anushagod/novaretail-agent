@@ -20,7 +20,7 @@ class EscalationPayload(BaseModel):
     recommended_next_action: str = Field(..., description="Concrete next step for the human agent.")
 
 EscalationIdentifier = Annotated[
-    EscalationPayload,
+    str,
     Field(description="Structured escalation handoff payload containing customer ID, summary, category, financial exposure, and next action."),
 ]
 
