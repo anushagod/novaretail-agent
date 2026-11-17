@@ -1,5 +1,7 @@
 import json
 import uuid
+from typing import Annotated
+from pydantic import Field
 from datetime import datetime
 from typing import Literal
 from pydantic import BaseModel, Field
@@ -17,8 +19,12 @@ class EscalationPayload(BaseModel):
     financial_exposure_usd: float = Field(..., description="Exact USD amount at issue, or 0.0 if non-financial.")
     recommended_next_action: str = Field(..., description="Concrete next step for the human agent.")
 
+EscalationIdentifier = Annotated[
+    EscalationPayload,
+    Field(description="Structured escalation handoff payload containing customer ID, summary, category, financial exposure, and next action."),
+]
 
-def escalate_to_human(payload: EscalationPayload) -> str:
+def escalate_to_human(payload: EscalationIdentifier) -> str:
     """
     Create a structured escalation ticket for a human specialist and terminate the autonomous agent loop.
 

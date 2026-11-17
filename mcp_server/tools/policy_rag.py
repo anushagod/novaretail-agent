@@ -1,8 +1,14 @@
 import json
+from typing import Annotated
+from pydantic import Field
 from mcp_server.shared import POLICIES_DIR, error_payload
 
+queryIdentifier = Annotated[
+    str,
+    Field(description="Keywords describing the policy topic (e.g., 'electronics return window', 'refund timeline'). Never include customer PII."),
+]
 
-def search_policy(query: str) -> str:
+def search_policy(query: queryIdentifier) -> str:
     """
     Search NovaRetail's official policy documents (returns, electronics windows, shipping, verification rules).
 

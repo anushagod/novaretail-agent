@@ -1,9 +1,31 @@
 import json
 import uuid
+from typing import Annotated
+from pydantic import Field
 from datetime import datetime
 from mcp_server.shared import error_payload, get_db_connection
 
-def process_refund(order_id: str, customer_id: str, reason: str) -> str:
+
+orderIdentifier = Annotated[
+    str,
+    Field(description="Unique order ID formatted as 'ORD-XXXX' (e.g., 'ORD-1001'). Do not pass customer IDs."),
+]
+
+customerIdentifier = Annotated[
+    str,
+    Field(description="Verified customer ID formatted as 'CUST-XXX' (e.g., 'CUST-101') confirmed via get_customer."),
+]
+
+reasonIdentifier = Annotated[
+    str,
+    Field(description="Concise summary of the customer's stated reason for requesting the refund (e.g., 'Defective item', 'No longer needed')."),
+]
+
+def process_refund(
+    order_id: orderIdentifier,
+    customer_id: customerIdentifier,
+    reason: reasonIdentifier
+) -> str:
     """
     Execute a financial refund for an eligible order.
 

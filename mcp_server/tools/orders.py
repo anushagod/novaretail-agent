@@ -1,9 +1,16 @@
 import json
+from typing import Annotated
+from pydantic import Field
 from datetime import datetime
 from typing import Optional
 from mcp_server.shared import error_payload, get_db_connection
 
-def lookup_order(order_id: str) -> str:
+OrderIdentifier = Annotated[
+    str,
+    Field(description="Unique order ID formatted as 'ORD-XXXX' (e.g., 'ORD-1001'). Do not pass customer IDs."),
+]   
+
+def lookup_order(order_id: OrderIdentifier) -> str:
     """
     Fetch order item details, dollar amount, delivery timestamp, and return window eligibility.
 
